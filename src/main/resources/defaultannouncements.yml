@@ -1,0 +1,18 @@
+announcements:
+  first:
+    text:
+      - This is AdvancedBungeeAnnouncer, developed by tuxed.
+      - It supports multi-line announcements, global announcements...
+    servers:
+      - global
+  second:
+    text:
+      - And even server-specific announcements!
+    servers:
+      - pvp
+      - creative
+  third:
+    text:
+      - "&9It even has support for colors!"
+    servers:
+      - global

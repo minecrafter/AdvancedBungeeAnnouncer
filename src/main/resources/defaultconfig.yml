@@ -1,0 +1,30 @@
+# =========================
+# AdvancedBungeeAnnouncer configuration
+# =========================
+
+#
+# ++ ANNOUNCEMENTS.YML HAS THE ANNOUNCEMENTS. ++
+#         They are _NOT_ in this file!
+#
+
+# --
+# ANNOUNCER CUSTOMIZATION
+# --
+
+# AdvancedBungeeAnnouncer runs on a static delay between all announcements.
+# This value lets you change the delay. It must be specified in seconds.
+# Default: 180 (3 minutes)
+
+delay: 180
+
+# This option changes how announcements are selected.
+# Choices available:
+# - sequential: default, picks announces as they are iterated over
+# - random: picks a random announcement for each server
+
+choose-announcement-via: sequential
+
+# This lets you set a prefix for the announcements.
+# Useful if you want to give your network an "identity" of sorts.
+
+prefix: ""
