@@ -6,7 +6,6 @@
  */
 package com.imaginarycode.minecraft.advancedbungeeannouncer;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.NonNull;
@@ -26,7 +25,7 @@ public class Announcement {
     public static Announcement create(@NonNull List<String> text) {
         // Global announcement
         Announcement announcement = new Announcement();
-        announcement.setText(ImmutableList.copyOf(text));
+        announcement.setText(Lists.newArrayList(text));
         announcement.setServers(Collections.singletonList("global"));
         return announcement;
     }
@@ -39,11 +38,11 @@ public class Announcement {
     }
 
     public static Announcement create(@NonNull String text) {
-        return create(Collections.singletonList(text));
+        return create(Lists.newArrayList(text));
     }
 
     public static Announcement create(@NonNull String text, @NonNull List<String> servers) {
-        return create(Collections.singletonList(text), servers);
+        return create(Lists.newArrayList(text), servers);
     }
 
     public void addServer(@NonNull String server) {
