@@ -8,6 +8,7 @@ package com.imaginarycode.minecraft.advancedbungeeannouncer;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.io.ByteStreams;
 import lombok.Getter;
 import net.craftminecraft.bungee.bungeeyaml.bukkitapi.file.YamlConfiguration;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -57,16 +58,9 @@ public class AdvancedBungeeAnnouncer extends Plugin {
         File cfg = new File(getDataFolder(), "config.yml");
         if (!cfg.exists()) {
             getDataFolder().mkdir();
-            try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(getResourceAsStream("defaultconfig.yml")));
-                BufferedWriter bw = new BufferedWriter(new FileWriter(cfg));
-                String line;
-                while ((line = br.readLine()) != null) {
-                    bw.write(line);
-                    bw.newLine();
-                }
-                bw.close();
-                br.close();
+            try (InputStream is = getResourceAsStream("defaultconfig.yml");
+                 FileOutputStream fos = new FileOutputStream(cfg)) {
+                ByteStreams.copy(is, fos);
             } catch (IOException e) {
                 getLogger().log(Level.SEVERE, "I/O error while reading or writing config files!", e);
             }
@@ -78,16 +72,9 @@ public class AdvancedBungeeAnnouncer extends Plugin {
         // Load the configuration (non-announcements)
         File annFile = new File(getDataFolder(), "announcements.yml");
         if (!annFile.exists()) {
-            try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(getResourceAsStream("defaultannouncements.yml")));
-                BufferedWriter bw = new BufferedWriter(new FileWriter(annFile));
-                String line;
-                while ((line = br.readLine()) != null) {
-                    bw.write(line);
-                    bw.newLine();
-                }
-                bw.close();
-                br.close();
+            try (InputStream is = getResourceAsStream("defaultannouncements.yml");
+                 FileOutputStream fos = new FileOutputStream(annFile)) {
+                ByteStreams.copy(is, fos);
             } catch (IOException e) {
                 getLogger().log(Level.SEVERE, "I/O error while reading or writing config files!", e);
             }
