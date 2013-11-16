@@ -26,7 +26,7 @@ public class Announcement {
         // Global announcement
         Announcement announcement = new Announcement();
         announcement.setText(Lists.newArrayList(text));
-        announcement.setServers(Collections.singletonList("global"));
+        announcement.setServers(Lists.newArrayList("global"));
         return announcement;
     }
 
