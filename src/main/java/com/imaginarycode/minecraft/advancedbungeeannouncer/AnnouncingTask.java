@@ -6,15 +6,25 @@
  */
 package com.imaginarycode.minecraft.advancedbungeeannouncer;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class AnnouncingTask implements Runnable {
     private Map<String, Integer> index = Maps.newHashMap();
+    private LoadingCache<String, Pattern> regexCache = CacheBuilder.newBuilder().build(new CacheLoader<String, Pattern>() {
+        @Override
+        public Pattern load(String s) throws Exception {
+            return Pattern.compile(s);
+        }
+    });
     private int timeSinceLastRun = 0;
     private Random rnd = new Random();
 
@@ -56,14 +66,13 @@ public class AnnouncingTask implements Runnable {
             while (true) {
                 a = announcements.get(index.get(server));
                 advanced(server);
-                if (a.getServers().contains(server) || a.getServers().contains("global")) {
+                if (doesAnnouncementMatch(a, server))
                     return a;
-                }
             }
         } else {
             while (true) {
                 a = announcements.get(rnd.nextInt(announcements.size()));
-                if (a.getServers().contains(server) || a.getServers().contains("global"))
+                if (doesAnnouncementMatch(a, server))
                     return a;
             }
         }
@@ -74,5 +83,25 @@ public class AnnouncingTask implements Runnable {
         if (index.get(key) == AdvancedBungeeAnnouncer.getAnnouncements().size()) {
             index.put(key, 0);
         }
+    }
+
+    private List<Pattern> producePatterns(List<String> patterns) {
+        List<Pattern> patterns1 = new ArrayList<>();
+        for (String pattern : patterns) {
+            patterns1.add(regexCache.getUnchecked(pattern));
+        }
+        return patterns1;
+    }
+
+    private boolean doesAnnouncementMatch(Announcement announcement, String server) {
+        if (announcement.getServers().contains(server) || announcement.getServers().contains("global")) {
+            return true;
+        }
+        for (Pattern pattern : producePatterns(announcement.getServers())) {
+            if (pattern.matcher(server).find()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
