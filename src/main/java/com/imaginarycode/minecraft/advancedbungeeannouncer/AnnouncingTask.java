@@ -12,9 +12,13 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 public class AnnouncingTask implements Runnable {
@@ -53,8 +57,8 @@ public class AnnouncingTask implements Runnable {
         for (ProxiedPlayer player : AdvancedBungeeAnnouncer.getPlugin().getProxy().getPlayers()) {
             // Find the server they are on, and give them an announcement.
             for (String line : sending.get(player.getServer().getInfo().getName()).getText()) {
-                player.sendMessage(AdvancedBungeeAnnouncer.getConfiguration().getString("prefix", "") +
-                        ChatColor.translateAlternateColorCodes('&', line));
+                player.sendMessage(TextComponent.fromLegacyText(AdvancedBungeeAnnouncer.getConfiguration().getString("prefix", "") +
+                        ChatColor.translateAlternateColorCodes('&', line)));
             }
         }
     }
