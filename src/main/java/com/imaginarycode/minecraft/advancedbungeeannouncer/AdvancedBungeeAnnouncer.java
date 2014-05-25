@@ -6,6 +6,7 @@
  */
 package com.imaginarycode.minecraft.advancedbungeeannouncer;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.ByteStreams;
 import lombok.Getter;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -14,8 +15,10 @@ import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.*;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -94,7 +97,14 @@ public class AdvancedBungeeAnnouncer extends Plugin {
             throw new RuntimeException("Could not load announcements.yml", e);
         }
 
-        for (Object key : ((Map)announcementConfiguration.get("announcements")).keySet()) {
+        Set keys = ((Map)announcementConfiguration.get("announcements")).keySet();
+
+        for (String key : ImmutableSet.copyOf(announcements.keySet())) {
+            if (!keys.contains(key))
+                announcements.remove(key);
+        }
+
+        for (Object key : keys) {
             if (announcementConfiguration.get("announcements." + key + ".text") instanceof List) {
                 if (announcementConfiguration.get("announcements." + key + ".servers") instanceof List) {
                     announcements.put((String)key, Announcement.create(announcementConfiguration.getStringList
