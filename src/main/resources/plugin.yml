@@ -1,5 +1,4 @@
 name: AdvancedBungeeAnnouncer
 main: com.imaginarycode.minecraft.advancedbungeeannouncer.AdvancedBungeeAnnouncer
 version: 0.1
-depends: ["BungeeYAML"]
 author: tuxed
