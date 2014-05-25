@@ -59,7 +59,7 @@ public class Announcement {
         text.add(line);
     }
 
-    public void removeLine(@NonNull String line) {
+    public void removeLine(@NonNull int line) {
         text.remove(line);
     }
 

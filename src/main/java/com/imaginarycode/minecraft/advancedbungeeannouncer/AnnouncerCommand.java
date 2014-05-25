@@ -107,6 +107,47 @@ public class AnnouncerCommand extends Command {
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "You do not have permission to update announcements."));
                 }
                 break;
+            case "addline":
+                if (commandSender.hasPermission("advancedbungeeannouncer.admin")) {
+                    if (strings.length < 3) {
+                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Not enough arguments specified."));
+                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/announcer addline <id> <text>"));
+                        return;
+                    }
+                    if (!AdvancedBungeeAnnouncer.getAnnouncements().containsKey(strings[1])) {
+                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An announcement with this ID does not exist."));
+                        return;
+                    }
+                    Announcement a = AdvancedBungeeAnnouncer.getAnnouncements().get(strings[1]);
+                    a.addLine(Joiner.on(" ").join(Arrays.copyOfRange(strings, 2, strings.length)));
+                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "Announcement updated!"));
+                } else {
+                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "You do not have permission to update announcements."));
+                }
+                break;
+            case "removeline":
+                if (commandSender.hasPermission("advancedbungeeannouncer.admin")) {
+                    if (strings.length < 3) {
+                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Not enough arguments specified."));
+                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/announcer removeline <id> <number>"));
+                        return;
+                    }
+                    if (!AdvancedBungeeAnnouncer.getAnnouncements().containsKey(strings[1])) {
+                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An announcement with this ID does not exist."));
+                        return;
+                    }
+                    Announcement a = AdvancedBungeeAnnouncer.getAnnouncements().get(strings[1]);
+                    try {
+                        a.removeLine(Integer.valueOf(strings[2]));
+                    } catch (NumberFormatException e) {
+                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "That line number is invalid."));
+                        return;
+                    }
+                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "Announcement updated!"));
+                } else {
+                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "You do not have permission to update announcements."));
+                }
+                break;
             case "list":
                 if (commandSender.hasPermission("advancedbungeeannouncer.admin")) {
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.YELLOW + "Announcements: " + Joiner.on(", ").join(
@@ -124,7 +165,7 @@ public class AnnouncerCommand extends Command {
                     Announcement a = AdvancedBungeeAnnouncer.getAnnouncements().get(strings[1]);
                     commandSender.sendMessage(TextComponent.fromLegacyText("-------------------------------------"));
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "Announcement ID: " + strings[1]));
-                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "Announcement Text:"));
+                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "Announcement Text: (lines: " + a.getText().size() + ")"));
                     for (String line : a.getText()) {
                         commandSender.sendMessage(TextComponent.fromLegacyText("- " + ChatColor.translateAlternateColorCodes('&', line)));
                     }
