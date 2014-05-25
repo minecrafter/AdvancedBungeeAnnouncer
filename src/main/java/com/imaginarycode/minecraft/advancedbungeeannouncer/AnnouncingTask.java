@@ -12,7 +12,9 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.ArrayList;
@@ -40,25 +42,31 @@ public class AnnouncingTask implements Runnable {
 
     @Override
     public void run() {
-        if (timeSinceLastRun >= AdvancedBungeeAnnouncer.getConfiguration().getInt("delay", 180)) {
+        if (timeSinceLastRun % AdvancedBungeeAnnouncer.getConfiguration().getInt("delay", 180) == 0) {
             timeSinceLastRun = 0;
         } else {
             timeSinceLastRun++;
             return;
         }
 
-        Map<String, Announcement> sending = Maps.newHashMap();
+        // Select and display our announcements.
+        for (Map.Entry<String, ServerInfo> entry : AdvancedBungeeAnnouncer.getPlugin().getProxy().getServers().entrySet()) {
+            Announcement announcement = selectAnnouncementFor(entry.getKey());
 
-        // Select our announcements.
-        for (String i : AdvancedBungeeAnnouncer.getPlugin().getProxy().getServers().keySet()) {
-            sending.put(i, selectAnnouncementFor(i));
-        }
+            if (announcement == null)
+                continue;
 
-        for (ProxiedPlayer player : AdvancedBungeeAnnouncer.getPlugin().getProxy().getPlayers()) {
-            // Find the server they are on, and give them an announcement.
-            for (String line : sending.get(player.getServer().getInfo().getName()).getText()) {
-                player.sendMessage(TextComponent.fromLegacyText(AdvancedBungeeAnnouncer.getConfiguration().getString("prefix", "") +
+            List<BaseComponent[]> components = new ArrayList<>();
+
+            for (String line : announcement.getText()) {
+                components.add(TextComponent.fromLegacyText(AdvancedBungeeAnnouncer.getConfiguration().getString("prefix", "") +
                         ChatColor.translateAlternateColorCodes('&', line)));
+            }
+
+            for (ProxiedPlayer player : entry.getValue().getPlayers()) {
+                for (BaseComponent[] component : components) {
+                    player.sendMessage(component);
+                }
             }
         }
     }
@@ -66,20 +74,24 @@ public class AnnouncingTask implements Runnable {
     private Announcement selectAnnouncementFor(String server) {
         List<Announcement> announcements = ImmutableList.copyOf(AdvancedBungeeAnnouncer.getAnnouncements().values());
         Announcement a;
+        int tries = 0;
         if (AdvancedBungeeAnnouncer.getConfiguration().getString("choose-announcement-via", "sequential").equals("sequential")) {
-            while (true) {
+            while (tries < 5) {
                 a = announcements.get(index.get(server));
                 advanced(server);
                 if (doesAnnouncementMatch(a, server))
                     return a;
+                tries++;
             }
         } else {
-            while (true) {
+            while (tries < 5) {
                 a = announcements.get(rnd.nextInt(announcements.size()));
                 if (doesAnnouncementMatch(a, server))
                     return a;
+                tries++;
             }
         }
+        return null;
     }
 
     private void advanced(String key) {

@@ -6,8 +6,6 @@
  */
 package com.imaginarycode.minecraft.advancedbungeeannouncer;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import lombok.Getter;
 import net.craftminecraft.bungee.bungeeyaml.bukkitapi.file.YamlConfiguration;
@@ -15,6 +13,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 
 import java.io.*;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -22,13 +21,10 @@ public class AdvancedBungeeAnnouncer extends Plugin {
 
     @Getter
     private static AdvancedBungeeAnnouncer plugin;
-    private static Map<String, Announcement> announcements = Maps.newHashMap();
+    @Getter
+    private static Map<String, Announcement> announcements = new ConcurrentHashMap<>(10, 0.75f, 1);
     @Getter private static YamlConfiguration configuration;
     @Getter private static YamlConfiguration announcementConfiguration;
-
-    public static Map<String, Announcement> getAnnouncements() {
-        return ImmutableMap.copyOf(announcements);
-    }
 
     @Override
     public void onEnable() {
@@ -37,8 +33,7 @@ public class AdvancedBungeeAnnouncer extends Plugin {
         reloadConfiguration();
 
         if (announcements.size() == 0) {
-            getLogger().severe("No announcements are configured :(");
-            return;
+            getLogger().severe("No announcements are configured.");
         }
 
         getProxy().getPluginManager().registerCommand(this, new AnnouncerCommand());
@@ -81,7 +76,6 @@ public class AdvancedBungeeAnnouncer extends Plugin {
         }
 
         announcementConfiguration = YamlConfiguration.loadConfiguration(annFile);
-        announcements.clear();
 
         for (String key : announcementConfiguration.getConfigurationSection("announcements").getKeys(false)) {
             if (announcementConfiguration.isList("announcements." + key + ".text")) {

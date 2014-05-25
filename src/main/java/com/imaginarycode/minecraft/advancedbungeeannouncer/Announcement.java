@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class Announcement {
     public static Announcement create(@NonNull List<String> text) {
         // Global announcement
         Announcement announcement = new Announcement();
-        announcement.setText(Lists.newArrayList(text));
+        announcement.setText(new ArrayList<>(text));
         announcement.setServers(Lists.newArrayList("global"));
         return announcement;
     }
@@ -33,12 +34,8 @@ public class Announcement {
     public static Announcement create(@NonNull List<String> text, @NonNull List<String> servers) {
         // Server-specific announcements
         Announcement announcement = create(text);
-        announcement.setServers(Lists.newArrayList(servers));
+        announcement.setServers(new ArrayList<>(servers));
         return announcement;
-    }
-
-    public static Announcement create(@NonNull String text) {
-        return create(Lists.newArrayList(text));
     }
 
     public static Announcement create(@NonNull String text, @NonNull List<String> servers) {
