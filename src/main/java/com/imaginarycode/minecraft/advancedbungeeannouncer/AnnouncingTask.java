@@ -90,6 +90,11 @@ public class AnnouncingTask implements Runnable {
                     return a;
                 tries++;
             }
+            // Forget it, let's just find one.
+            for (Announcement announcement : announcements) {
+                if (doesAnnouncementMatch(announcement, server))
+                    return announcement;
+            }
         }
         return null;
     }
