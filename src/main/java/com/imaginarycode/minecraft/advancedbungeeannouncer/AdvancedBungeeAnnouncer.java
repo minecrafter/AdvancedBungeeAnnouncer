@@ -8,10 +8,13 @@ package com.imaginarycode.minecraft.advancedbungeeannouncer;
 
 import com.google.common.io.ByteStreams;
 import lombok.Getter;
-import net.craftminecraft.bungee.bungeeyaml.bukkitapi.file.YamlConfiguration;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.config.Configuration;
+import net.md_5.bungee.config.ConfigurationProvider;
+import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.*;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -23,8 +26,8 @@ public class AdvancedBungeeAnnouncer extends Plugin {
     private static AdvancedBungeeAnnouncer plugin;
     @Getter
     private static Map<String, Announcement> announcements = new ConcurrentHashMap<>(10, 0.75f, 1);
-    @Getter private static YamlConfiguration configuration;
-    @Getter private static YamlConfiguration announcementConfiguration;
+    @Getter private static Configuration configuration;
+    @Getter private static Configuration announcementConfiguration;
 
     @Override
     public void onEnable() {
@@ -61,7 +64,14 @@ public class AdvancedBungeeAnnouncer extends Plugin {
             }
         }
 
-        configuration = YamlConfiguration.loadConfiguration(cfg);
+        try
+        {
+            configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(cfg);
+        }
+        catch(IOException e)
+        {
+            throw new RuntimeException("Could not load config.yml", e);
+        }
 
         // Load and parse the announcements
         // Load the configuration (non-announcements)
@@ -75,12 +85,19 @@ public class AdvancedBungeeAnnouncer extends Plugin {
             }
         }
 
-        announcementConfiguration = YamlConfiguration.loadConfiguration(annFile);
+        try
+        {
+            announcementConfiguration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(annFile);
+        }
+        catch(IOException e)
+        {
+            throw new RuntimeException("Could not load announcements.yml", e);
+        }
 
-        for (String key : announcementConfiguration.getConfigurationSection("announcements").getKeys(false)) {
-            if (announcementConfiguration.isList("announcements." + key + ".text")) {
-                if (announcementConfiguration.isList("announcements." + key + ".servers")) {
-                    announcements.put(key, Announcement.create(announcementConfiguration.getStringList
+        for (Object key : ((Map)announcementConfiguration.get("announcements")).keySet()) {
+            if (announcementConfiguration.get("announcements." + key + ".text") instanceof List) {
+                if (announcementConfiguration.get("announcements." + key + ".servers") instanceof List) {
+                    announcements.put((String)key, Announcement.create(announcementConfiguration.getStringList
                             ("announcements." + key + ".text"), announcementConfiguration.getStringList
                             ("announcements." + key + ".servers")));
                 }
@@ -90,7 +107,7 @@ public class AdvancedBungeeAnnouncer extends Plugin {
 
     @Override
     public void onDisable() {
-        for (String key : announcementConfiguration.getConfigurationSection("announcements").getKeys(false)) {
+        for (Object key : ((Map)announcementConfiguration.get("announcements")).keySet()) {
             if (!announcements.containsKey(key)) {
                 announcementConfiguration.set("announcements." + key + ".text", null);
                 announcementConfiguration.set("announcements." + key + ".servers", null);
@@ -102,7 +119,7 @@ public class AdvancedBungeeAnnouncer extends Plugin {
             announcementConfiguration.set("announcements." + key + ".servers", announcements.get(key).getServers());
         }
         try {
-            announcementConfiguration.save(new File(getDataFolder(), "announcements.yml"));
+            YamlConfiguration.getProvider(YamlConfiguration.class).save(announcementConfiguration, new File(getDataFolder(), "announcements.yml"));
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, "I/O error while writing announcements!", e);
         }
