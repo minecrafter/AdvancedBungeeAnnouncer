@@ -176,7 +176,7 @@ public class AnnouncerCommand extends Command {
                 }
                 break;
             default:
-                commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/announcer <about|reload|create|remove|setline|list|info>"));
+                commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/announcer <about|reload|create|remove|{set,add,remove}line|list|info>"));
         }
     }
 
