@@ -102,7 +102,6 @@ public class AnnouncerCommand extends Command {
                         commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "That line number is invalid."));
                         return;
                     }
-                    AdvancedBungeeAnnouncer.getPlugin().addAnnouncement(strings[1], a);
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "Announcement updated!"));
                 } else {
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "You do not have permission to update announcements."));
