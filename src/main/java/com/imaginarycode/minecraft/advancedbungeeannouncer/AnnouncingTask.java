@@ -42,7 +42,7 @@ public class AnnouncingTask implements Runnable {
 
     @Override
     public void run() {
-        if (timeSinceLastRun >= AdvancedBungeeAnnouncer.getConfiguration().getInt("delay", 180)) {
+        if (timeSinceLastRun + 1 >= AdvancedBungeeAnnouncer.getConfiguration().getInt("delay", 180)) {
             timeSinceLastRun = 0;
         } else {
             timeSinceLastRun++;
