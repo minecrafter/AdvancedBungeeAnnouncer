@@ -139,7 +139,7 @@ public class AnnouncerCommand extends Command {
                     Announcement a = AdvancedBungeeAnnouncer.getAnnouncements().get(strings[1]);
                     try {
                         a.removeLine(Integer.valueOf(strings[2]));
-                    } catch (NumberFormatException e) {
+                    } catch (NumberFormatException | IndexOutOfBoundsException e) {
                         commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "That line number is invalid."));
                         return;
                     }
