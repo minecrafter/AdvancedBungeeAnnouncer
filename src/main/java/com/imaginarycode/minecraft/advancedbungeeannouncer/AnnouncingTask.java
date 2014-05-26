@@ -59,8 +59,7 @@ public class AnnouncingTask implements Runnable {
             List<BaseComponent[]> components = new ArrayList<>();
 
             for (String line : announcement.getText()) {
-                components.add(TextComponent.fromLegacyText(AdvancedBungeeAnnouncer.getConfiguration().getString("prefix", "") +
-                        ChatColor.translateAlternateColorCodes('&', line)));
+                components.add(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', AdvancedBungeeAnnouncer.getConfiguration().getString("prefix", "") + line)));
             }
 
             for (ProxiedPlayer player : entry.getValue().getPlayers()) {
