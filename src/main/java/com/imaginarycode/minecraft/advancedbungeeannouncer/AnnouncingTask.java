@@ -51,6 +51,9 @@ public class AnnouncingTask implements Runnable {
 
         // Select and display our announcements.
         for (Map.Entry<String, ServerInfo> entry : AdvancedBungeeAnnouncer.getPlugin().getProxy().getServers().entrySet()) {
+            if (entry.getValue().getPlayers().isEmpty())
+                continue;
+
             Announcement announcement = selectAnnouncementFor(entry.getKey());
 
             if (announcement == null)
