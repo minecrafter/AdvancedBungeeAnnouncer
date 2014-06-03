@@ -16,8 +16,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class Announcement {
-    @NonNull @Getter @Setter private List<String> text = Collections.emptyList();
-    @Getter @Setter private List<String> servers = Lists.newArrayList();
+    @Getter
+    private List<String> text = new ArrayList<>();
+    @Getter
+    private List<String> servers = new ArrayList<>();
 
     protected Announcement() {
         // Nope, not this time!
@@ -26,15 +28,16 @@ public class Announcement {
     public static Announcement create(@NonNull List<String> text) {
         // Global announcement
         Announcement announcement = new Announcement();
-        announcement.setText(new ArrayList<>(text));
-        announcement.setServers(Lists.newArrayList("global"));
+        announcement.getText().addAll(text);
+        announcement.getServers().add("global");
         return announcement;
     }
 
     public static Announcement create(@NonNull List<String> text, @NonNull List<String> servers) {
         // Server-specific announcements
-        Announcement announcement = create(text);
-        announcement.setServers(new ArrayList<>(servers));
+        Announcement announcement = new Announcement();
+        announcement.getText().addAll(text);
+        announcement.getServers().addAll(servers);
         return announcement;
     }
 
