@@ -57,16 +57,4 @@ public class Announcement {
             servers.remove(server);
         }
     }
-
-    public void addLine(@NonNull String line) {
-        text.add(line);
-    }
-
-    public void removeLine(@NonNull int line) {
-        text.remove(line);
-    }
-
-    public void setLine(int id, @NonNull String line) {
-        text.set(id, line);
-    }
 }
