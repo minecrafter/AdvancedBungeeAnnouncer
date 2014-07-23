@@ -19,6 +19,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 import java.util.*;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 public class AnnouncingTask implements Runnable {
@@ -47,7 +48,7 @@ public class AnnouncingTask implements Runnable {
             return;
         }
 
-        String prefix = AdvancedBungeeAnnouncer.getConfiguration().getString("prefix", "");
+        String prefix = ChatColor.translateAlternateColorCodes('&', AdvancedBungeeAnnouncer.getConfiguration().getString("prefix", ""));
 
         // Select and display our announcements.
         for (Map.Entry<String, ServerInfo> entry : AdvancedBungeeAnnouncer.getPlugin().getProxy().getServers().entrySet()) {
@@ -62,11 +63,7 @@ public class AnnouncingTask implements Runnable {
             List<BaseComponent[]> components = new ArrayList<>();
 
             for (String line : announcement.getText()) {
-                // Cheap case: No JSON.
-                if (!line.startsWith("{")) {
-                    components.add(TextComponent.fromLegacyText(prefix + line));
-                } else {
-                    // May be JSON-formatted, let's see if we can parse it.
+                if (line.startsWith("{")) {
                     try {
                         BaseComponent[] components2 = ComponentSerializer.parse(line);
                         BaseComponent[] prefixComp = TextComponent.fromLegacyText(prefix);
@@ -78,9 +75,10 @@ public class AnnouncingTask implements Runnable {
 
                         components.add(prefixComp);
                     } catch (Exception ignored) {
-                        // Eat it.
-                        components.add(TextComponent.fromLegacyText(prefix + line));
+                        components.add(TextComponent.fromLegacyText(prefix + ChatColor.translateAlternateColorCodes('&', line)));
                     }
+                } else {
+                    components.add(TextComponent.fromLegacyText(prefix + ChatColor.translateAlternateColorCodes('&', line)));
                 }
             }
 
