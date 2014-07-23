@@ -59,34 +59,34 @@ public class AnnouncingTask implements Runnable {
             if (announcement == null)
                 continue;
 
-            List<List<BaseComponent[]>> components = new ArrayList<>();
+            List<BaseComponent[]> components = new ArrayList<>();
 
             for (String line : announcement.getText()) {
-                List<BaseComponent[]> components1;
-
                 // Cheap case: No JSON.
                 if (!line.startsWith("{")) {
-                    components1 = Collections.singletonList(TextComponent.fromLegacyText(prefix + line));
+                    components.add(TextComponent.fromLegacyText(prefix + line));
                 } else {
                     // May be JSON-formatted, let's see if we can parse it.
                     try {
                         BaseComponent[] components2 = ComponentSerializer.parse(line);
-                        // Do prefix magic
-                        components1 = new ArrayList<>();
-                        components1.add(TextComponent.fromLegacyText(prefix));
-                        components1.add(components2);
+                        BaseComponent[] prefixComp = TextComponent.fromLegacyText(prefix);
+
+                        if (prefixComp.length != 0)
+                            prefixComp[0].setExtra(Arrays.asList(components2));
+                        else
+                            prefixComp = components2;
+
+                        components.add(prefixComp);
                     } catch (Exception ignored) {
                         // Eat it.
-                        components1 = Collections.singletonList(TextComponent.fromLegacyText(prefix + line));
+                        components.add(TextComponent.fromLegacyText(prefix + line));
                     }
                 }
-
-                components.add(components1);
             }
 
             for (ProxiedPlayer player : entry.getValue().getPlayers()) {
-                for (List<BaseComponent[]> component : components) {
-                    player.sendMessage((BaseComponent[]) component.toArray());
+                for (BaseComponent[] component : components) {
+                    player.sendMessage(component);
                 }
             }
         }
