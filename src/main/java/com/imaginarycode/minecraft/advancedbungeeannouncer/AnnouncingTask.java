@@ -16,11 +16,9 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.chat.ComponentSerializer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class AnnouncingTask implements Runnable {
@@ -49,6 +47,8 @@ public class AnnouncingTask implements Runnable {
             return;
         }
 
+        String prefix = AdvancedBungeeAnnouncer.getConfiguration().getString("prefix", "");
+
         // Select and display our announcements.
         for (Map.Entry<String, ServerInfo> entry : AdvancedBungeeAnnouncer.getPlugin().getProxy().getServers().entrySet()) {
             if (entry.getValue().getPlayers().isEmpty())
@@ -59,15 +59,34 @@ public class AnnouncingTask implements Runnable {
             if (announcement == null)
                 continue;
 
-            List<BaseComponent[]> components = new ArrayList<>();
+            List<List<BaseComponent[]>> components = new ArrayList<>();
 
             for (String line : announcement.getText()) {
-                components.add(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', AdvancedBungeeAnnouncer.getConfiguration().getString("prefix", "") + line)));
+                List<BaseComponent[]> components1;
+
+                // Cheap case: No JSON.
+                if (!line.startsWith("{")) {
+                    components1 = Collections.singletonList(TextComponent.fromLegacyText(prefix + line));
+                } else {
+                    // May be JSON-formatted, let's see if we can parse it.
+                    try {
+                        BaseComponent[] components2 = ComponentSerializer.parse(line);
+                        // Do prefix magic
+                        components1 = new ArrayList<>();
+                        components1.add(TextComponent.fromLegacyText(prefix));
+                        components1.add(components2);
+                    } catch (Exception ignored) {
+                        // Eat it.
+                        components1 = Collections.singletonList(TextComponent.fromLegacyText(prefix + line));
+                    }
+                }
+
+                components.add(components1);
             }
 
             for (ProxiedPlayer player : entry.getValue().getPlayers()) {
-                for (BaseComponent[] component : components) {
-                    player.sendMessage(component);
+                for (List<BaseComponent[]> component : components) {
+                    player.sendMessage((BaseComponent[]) component.toArray());
                 }
             }
         }
