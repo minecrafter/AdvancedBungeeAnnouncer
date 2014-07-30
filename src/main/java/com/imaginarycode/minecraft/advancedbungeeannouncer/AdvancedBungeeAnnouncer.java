@@ -15,10 +15,7 @@ import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.*;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -97,7 +94,7 @@ public class AdvancedBungeeAnnouncer extends Plugin {
             throw new RuntimeException("Could not load announcements.yml", e);
         }
 
-        Set keys = ((Map)announcementConfiguration.get("announcements")).keySet();
+        Collection<String> keys = announcementConfiguration.getSection("announcements").getKeys();
 
         for (String key : ImmutableSet.copyOf(announcements.keySet())) {
             if (!keys.contains(key))
@@ -117,7 +114,7 @@ public class AdvancedBungeeAnnouncer extends Plugin {
 
     @Override
     public void onDisable() {
-        for (Object key : ((Map)announcementConfiguration.get("announcements")).keySet()) {
+        for (String key : announcementConfiguration.getSection("announcements").getKeys()) {
             if (!announcements.containsKey(key)) {
                 announcementConfiguration.set("announcements." + key + ".text", null);
                 announcementConfiguration.set("announcements." + key + ".servers", null);
