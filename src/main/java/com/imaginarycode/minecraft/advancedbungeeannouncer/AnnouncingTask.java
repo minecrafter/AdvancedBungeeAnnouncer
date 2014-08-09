@@ -83,6 +83,10 @@ public class AnnouncingTask implements Runnable {
             }
 
             for (ProxiedPlayer player : entry.getValue().getPlayers()) {
+                if (player.hasPermission("advancedbungeeannouncer.ignore") ||
+                        player.hasPermission("advancedbungeeannouncer.ignore.server." + entry.getKey()))
+                    continue;
+
                 for (BaseComponent[] component : components) {
                     player.sendMessage(component);
                 }
