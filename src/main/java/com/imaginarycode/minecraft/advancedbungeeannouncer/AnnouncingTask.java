@@ -33,12 +33,6 @@ public class AnnouncingTask implements Runnable {
     private int timeSinceLastRun = 0;
     private Random rnd = new Random();
 
-    public AnnouncingTask() {
-        for (String i : AdvancedBungeeAnnouncer.getPlugin().getProxy().getServers().keySet()) {
-            index.put(i, 0);
-        }
-    }
-
     @Override
     public void run() {
         if (timeSinceLastRun + 1 >= AdvancedBungeeAnnouncer.getConfiguration().getInt("delay", 180)) {
@@ -55,6 +49,9 @@ public class AnnouncingTask implements Runnable {
             if (entry.getValue().getPlayers().isEmpty())
                 continue;
 
+            if (!index.containsKey(entry.getKey()))
+                index.put(entry.getKey(), 0);
+
             Announcement announcement = selectAnnouncementFor(entry.getKey());
 
             if (announcement == null)
@@ -69,7 +66,7 @@ public class AnnouncingTask implements Runnable {
                         BaseComponent[] prefixComp = TextComponent.fromLegacyText(prefix);
 
                         if (prefixComp.length != 0)
-                            prefixComp[0].setExtra(Arrays.asList(components2));
+                            prefixComp[prefixComp.length - 1].setExtra(Arrays.asList(components2));
                         else
                             prefixComp = components2;
 
@@ -123,10 +120,12 @@ public class AnnouncingTask implements Runnable {
     }
 
     private void advanced(String key) {
-        index.put(key, index.get(key) + 1);
-        if (index.get(key) == AdvancedBungeeAnnouncer.getAnnouncements().size()) {
+        int val = index.get(key);
+
+        if (val + 1 == AdvancedBungeeAnnouncer.getAnnouncements().size())
             index.put(key, 0);
-        }
+        else
+            index.put(key, val + 1);
     }
 
     private List<Pattern> producePatterns(List<String> patterns) {
