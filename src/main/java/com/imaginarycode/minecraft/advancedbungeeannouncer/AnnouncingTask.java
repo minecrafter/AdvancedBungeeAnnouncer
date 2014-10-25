@@ -11,6 +11,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -34,6 +36,7 @@ public class AnnouncingTask implements Runnable {
     });
     private int timeSinceLastRun = 0;
     private Random rnd = new Random();
+    private Gson gson = new Gson();
 
     @Override
     public void run() {
@@ -101,7 +104,14 @@ public class AnnouncingTask implements Runnable {
                 if (AdvancedBungeeAnnouncer.getConfiguration().getString("display", "chat").equals("chat")) {
                     player.sendMessage(component);
                 } else {
-                    player.unsafe().sendPacket(new Chat(ComponentSerializer.toString(component), (byte)2));
+                    // WTF?!? With 1.8 you have to use legacy text inside chat JSON.
+                    if (player.getPendingConnection().getVersion() >= 47) { // 1.8
+                        JsonObject object = new JsonObject();
+                        object.addProperty("text", TextComponent.toLegacyText(component));
+                        player.unsafe().sendPacket(new Chat(gson.toJson(object), (byte) 2));
+                    } else {
+                        player.sendMessage(component);
+                    }
                 }
             }
         }

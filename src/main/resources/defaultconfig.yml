@@ -33,4 +33,6 @@ prefix: ""
 # Choices available:
 # - chat: Sends messages to chat
 # - action: Sends the announcement as an above action bar message
+# NOTE:     If the player is not using Minecraft 1.8, the announcement
+#           is sent as a chat message.
 display: chat
