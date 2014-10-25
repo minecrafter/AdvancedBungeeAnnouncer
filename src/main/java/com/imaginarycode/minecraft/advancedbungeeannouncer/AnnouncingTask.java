@@ -12,18 +12,20 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.chat.ComponentSerializer;
+import net.md_5.bungee.protocol.packet.Chat;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 public class AnnouncingTask implements Runnable {
-    private Map<String, Integer> index = Maps.newHashMap();
+    private Map<String, Integer> index = new HashMap<>();
     private LoadingCache<String, Pattern> regexCache = CacheBuilder.newBuilder().build(new CacheLoader<String, Pattern>() {
         @Override
         public Pattern load(String s) throws Exception {
@@ -42,17 +44,33 @@ public class AnnouncingTask implements Runnable {
             return;
         }
 
+        if (AdvancedBungeeAnnouncer.getAnnouncements().isEmpty())
+            return;
+
         String prefix = ChatColor.translateAlternateColorCodes('&', AdvancedBungeeAnnouncer.getConfiguration().getString("prefix", ""));
 
         // Select and display our announcements.
-        for (Map.Entry<String, ServerInfo> entry : AdvancedBungeeAnnouncer.getPlugin().getProxy().getServers().entrySet()) {
-            if (entry.getValue().getPlayers().isEmpty())
+        Map<String, Announcement> selectedAnnouncements = new HashMap<>();
+
+        for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
+            if (player.getServer() == null) {
+                // No use in giving connecting players an announcement
+                continue;
+            }
+
+            ServerInfo info = player.getServer().getInfo();
+
+            if (player.hasPermission("advancedbungeeannouncer.ignore") ||
+                    player.hasPermission("advancedbungeeannouncer.ignore.server." + info.getName()))
                 continue;
 
-            if (!index.containsKey(entry.getKey()))
-                index.put(entry.getKey(), 0);
+            if (!index.containsKey(info.getName()))
+                index.put(info.getName(), 0);
 
-            Announcement announcement = selectAnnouncementFor(entry.getKey());
+            Announcement announcement = selectedAnnouncements.get(info.getName());
+
+            if (announcement == null)
+                selectedAnnouncements.put(info.getName(), announcement = selectAnnouncementFor(info.getName()));
 
             if (announcement == null)
                 continue;
@@ -79,13 +97,11 @@ public class AnnouncingTask implements Runnable {
                 }
             }
 
-            for (ProxiedPlayer player : entry.getValue().getPlayers()) {
-                if (player.hasPermission("advancedbungeeannouncer.ignore") ||
-                        player.hasPermission("advancedbungeeannouncer.ignore.server." + entry.getKey()))
-                    continue;
-
-                for (BaseComponent[] component : components) {
+            for (BaseComponent[] component : components) {
+                if (AdvancedBungeeAnnouncer.getConfiguration().getString("display", "chat").equals("chat")) {
                     player.sendMessage(component);
+                } else {
+                    player.unsafe().sendPacket(new Chat(ComponentSerializer.toString(component), (byte)2));
                 }
             }
         }
@@ -122,7 +138,7 @@ public class AnnouncingTask implements Runnable {
     private void advanced(String key) {
         int val = index.get(key);
 
-        if (val + 1 == AdvancedBungeeAnnouncer.getAnnouncements().size())
+        if (val + 1 >= AdvancedBungeeAnnouncer.getAnnouncements().size())
             index.put(key, 0);
         else
             index.put(key, val + 1);

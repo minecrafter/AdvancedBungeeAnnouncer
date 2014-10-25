@@ -9,10 +9,8 @@ package com.imaginarycode.minecraft.advancedbungeeannouncer;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Announcement {

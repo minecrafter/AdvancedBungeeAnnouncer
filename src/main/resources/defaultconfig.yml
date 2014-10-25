@@ -28,3 +28,9 @@ choose-announcement-via: sequential
 # Useful if you want to give your network an "identity" of sorts.
 
 prefix: ""
+
+# Choose how the announcements are displayed.
+# Choices available:
+# - chat: Sends messages to chat
+# - action: Sends the announcement as an above action bar message
+display: chat
