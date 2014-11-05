@@ -123,7 +123,15 @@ public class AnnouncingTask implements Runnable {
         int tries = 0;
         if (AdvancedBungeeAnnouncer.getConfiguration().getString("choose-announcement-via", "sequential").equals("sequential")) {
             while (tries < 5) {
-                a = announcements.get(index.get(server));
+                int idx = index.get(server);
+
+                if (idx >= announcements.size()) {
+                    // Reset the index
+                    idx = 0;
+                    index.put(server, 0);
+                }
+
+                a = announcements.get(idx);
                 advanced(server);
                 if (doesAnnouncementMatch(a, server))
                     return a;
