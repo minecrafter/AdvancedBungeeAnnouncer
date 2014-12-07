@@ -10,53 +10,58 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.imaginarycode.minecraft.advancedbungeeannouncer.config.AnnouncementDisplay;
+import com.imaginarycode.minecraft.advancedbungeeannouncer.config.SelectionMethod;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.chat.ComponentSerializer;
-import net.md_5.bungee.protocol.packet.Chat;
 
 import java.util.*;
-import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-public class AnnouncingTask implements Runnable {
+public class AnnouncingTask implements Runnable
+{
     private Map<String, Integer> index = new HashMap<>();
-    private LoadingCache<String, Pattern> regexCache = CacheBuilder.newBuilder().build(new CacheLoader<String, Pattern>() {
+    private LoadingCache<String, Pattern> regexCache = CacheBuilder.newBuilder().build(new CacheLoader<String, Pattern>()
+    {
         @Override
-        public Pattern load(String s) throws Exception {
+        public Pattern load(String s) throws Exception
+        {
             return Pattern.compile(s);
         }
     });
     private int timeSinceLastRun = 0;
     private Random rnd = new Random();
-    private Gson gson = new Gson();
 
     @Override
-    public void run() {
-        if (timeSinceLastRun + 1 >= AdvancedBungeeAnnouncer.getConfiguration().getInt("delay", 180)) {
+    public void run()
+    {
+        if (timeSinceLastRun + 1 >= AdvancedBungeeAnnouncer.getConfiguration().getDelay())
+        {
             timeSinceLastRun = 0;
-        } else {
+        } else
+        {
             timeSinceLastRun++;
             return;
         }
 
-        if (AdvancedBungeeAnnouncer.getAnnouncements().isEmpty())
+        if (AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().isEmpty())
             return;
 
-        String prefix = ChatColor.translateAlternateColorCodes('&', AdvancedBungeeAnnouncer.getConfiguration().getString("prefix", ""));
+        String prefix = ChatColor.translateAlternateColorCodes('&', AdvancedBungeeAnnouncer.getConfiguration().getPrefix());
 
         // Select and display our announcements.
         Map<String, Announcement> selectedAnnouncements = new HashMap<>();
 
-        for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-            if (player.getServer() == null) {
+        for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers())
+        {
+            if (player.getServer() == null)
+            {
                 // No use in giving connecting players an announcement
                 continue;
             }
@@ -80,9 +85,12 @@ public class AnnouncingTask implements Runnable {
 
             List<BaseComponent[]> components = new ArrayList<>();
 
-            for (String line : announcement.getText()) {
-                if (line.startsWith("{")) {
-                    try {
+            for (String line : announcement.getText())
+            {
+                if (line.startsWith("{"))
+                {
+                    try
+                    {
                         BaseComponent[] components2 = ComponentSerializer.parse(line);
                         BaseComponent[] prefixComp = TextComponent.fromLegacyText(prefix);
 
@@ -92,40 +100,38 @@ public class AnnouncingTask implements Runnable {
                             prefixComp = components2;
 
                         components.add(prefixComp);
-                    } catch (Exception ignored) {
+                    }
+                    catch (Exception ignored)
+                    {
                         components.add(TextComponent.fromLegacyText(prefix + ChatColor.translateAlternateColorCodes('&', line)));
                     }
-                } else {
+                } else
+                {
                     components.add(TextComponent.fromLegacyText(prefix + ChatColor.translateAlternateColorCodes('&', line)));
                 }
             }
 
-            for (BaseComponent[] component : components) {
-                if (AdvancedBungeeAnnouncer.getConfiguration().getString("display", "chat").equals("chat")) {
-                    player.sendMessage(component);
-                } else {
-                    // WTF?!? With 1.8 you have to use legacy text inside chat JSON.
-                    if (player.getPendingConnection().getVersion() >= 47) { // 1.8
-                        JsonObject object = new JsonObject();
-                        object.addProperty("text", TextComponent.toLegacyText(component));
-                        player.unsafe().sendPacket(new Chat(gson.toJson(object), (byte) 2));
-                    } else {
-                        player.sendMessage(component);
-                    }
-                }
+            for (BaseComponent[] component : components)
+            {
+                player.sendMessage(AdvancedBungeeAnnouncer.getConfiguration().getDisplay() == AnnouncementDisplay.ACTION ?
+                        ChatMessageType.ACTION_BAR : ChatMessageType.CHAT, component);
             }
         }
     }
 
-    private Announcement selectAnnouncementFor(String server) {
-        List<Announcement> announcements = ImmutableList.copyOf(AdvancedBungeeAnnouncer.getAnnouncements().values());
+    private Announcement selectAnnouncementFor(String server)
+    {
+        List<Announcement> announcements = ImmutableList.copyOf(AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().values());
         Announcement a;
         int tries = 0;
-        if (AdvancedBungeeAnnouncer.getConfiguration().getString("choose-announcement-via", "sequential").equals("sequential")) {
-            while (tries < 5) {
+        if (AdvancedBungeeAnnouncer.getConfiguration().getMethod() == SelectionMethod.SEQUENTIAL)
+        {
+            while (tries < 5)
+            {
                 int idx = index.get(server);
 
-                if (idx >= announcements.size()) {
+                if (idx >= announcements.size())
+                {
                     // Reset the index
                     idx = 0;
                     index.put(server, 0);
@@ -137,15 +143,18 @@ public class AnnouncingTask implements Runnable {
                     return a;
                 tries++;
             }
-        } else {
-            while (tries < 5) {
+        } else
+        {
+            while (tries < 5)
+            {
                 a = announcements.get(rnd.nextInt(announcements.size()));
                 if (doesAnnouncementMatch(a, server))
                     return a;
                 tries++;
             }
             // Forget it, let's just find one.
-            for (Announcement announcement : announcements) {
+            for (Announcement announcement : announcements)
+            {
                 if (doesAnnouncementMatch(announcement, server))
                     return announcement;
             }
@@ -153,29 +162,36 @@ public class AnnouncingTask implements Runnable {
         return null;
     }
 
-    private void advanced(String key) {
+    private void advanced(String key)
+    {
         int val = index.get(key);
 
-        if (val + 1 >= AdvancedBungeeAnnouncer.getAnnouncements().size())
+        if (val + 1 >= AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().size())
             index.put(key, 0);
         else
             index.put(key, val + 1);
     }
 
-    private List<Pattern> producePatterns(List<String> patterns) {
+    private List<Pattern> producePatterns(List<String> patterns)
+    {
         List<Pattern> patterns1 = new ArrayList<>();
-        for (String pattern : patterns) {
+        for (String pattern : patterns)
+        {
             patterns1.add(regexCache.getUnchecked(pattern));
         }
         return patterns1;
     }
 
-    private boolean doesAnnouncementMatch(Announcement announcement, String server) {
-        if (announcement.getServers().contains(server) || announcement.getServers().contains("global")) {
+    private boolean doesAnnouncementMatch(Announcement announcement, String server)
+    {
+        if (announcement.getServers().contains(server) || announcement.getServers().contains("global"))
+        {
             return true;
         }
-        for (Pattern pattern : producePatterns(announcement.getServers())) {
-            if (pattern.matcher(server).find()) {
+        for (Pattern pattern : producePatterns(announcement.getServers()))
+        {
+            if (pattern.matcher(server).find())
+            {
                 return true;
             }
         }

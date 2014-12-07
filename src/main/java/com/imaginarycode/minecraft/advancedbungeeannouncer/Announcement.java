@@ -13,17 +13,20 @@ import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Announcement {
+public class Announcement
+{
     @Getter
     private List<String> text = new ArrayList<>();
     @Getter
     private List<String> servers = new ArrayList<>();
 
-    protected Announcement() {
+    protected Announcement()
+    {
         // Nope, not this time!
     }
 
-    public static Announcement create(@NonNull List<String> text) {
+    public static Announcement create(@NonNull List<String> text)
+    {
         // Global announcement
         Announcement announcement = new Announcement();
         announcement.getText().addAll(text);
@@ -31,7 +34,8 @@ public class Announcement {
         return announcement;
     }
 
-    public static Announcement create(@NonNull List<String> text, @NonNull List<String> servers) {
+    public static Announcement create(@NonNull List<String> text, @NonNull List<String> servers)
+    {
         // Server-specific announcements
         Announcement announcement = new Announcement();
         announcement.getText().addAll(text);
@@ -39,19 +43,24 @@ public class Announcement {
         return announcement;
     }
 
-    public static Announcement create(@NonNull String text, @NonNull List<String> servers) {
+    public static Announcement create(@NonNull String text, @NonNull List<String> servers)
+    {
         return create(Lists.newArrayList(text), servers);
     }
 
-    public void addServer(@NonNull String server) {
-        if (AdvancedBungeeAnnouncer.getPlugin().getProxy().getServers().containsKey(server)) {
+    public void addServer(@NonNull String server)
+    {
+        if (AdvancedBungeeAnnouncer.getPlugin().getProxy().getServers().containsKey(server))
+        {
             servers.add(server);
         }
     }
 
-    public void removeServer(@NonNull String server) {
+    public void removeServer(@NonNull String server)
+    {
         if (AdvancedBungeeAnnouncer.getPlugin().getProxy().getServers().containsKey(server) &&
-                servers.contains(server)) {
+                servers.contains(server))
+        {
             servers.remove(server);
         }
     }
