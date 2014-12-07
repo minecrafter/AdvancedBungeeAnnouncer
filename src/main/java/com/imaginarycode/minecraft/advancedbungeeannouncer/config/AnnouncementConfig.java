@@ -72,6 +72,8 @@ public class AnnouncementConfig
 
         Collection<String> keys = announcements.getKeys();
 
+        this.announcements.clear();
+
         for (String key : keys)
         {
             if (announcements.get(key + ".text") instanceof List)
