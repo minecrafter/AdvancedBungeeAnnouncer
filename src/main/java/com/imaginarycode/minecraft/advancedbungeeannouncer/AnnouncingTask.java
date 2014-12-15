@@ -6,9 +6,6 @@
  */
 package com.imaginarycode.minecraft.advancedbungeeannouncer;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.imaginarycode.minecraft.advancedbungeeannouncer.config.AnnouncementDisplay;
 import com.imaginarycode.minecraft.advancedbungeeannouncer.config.SelectionMethod;
@@ -27,14 +24,6 @@ import java.util.regex.Pattern;
 public class AnnouncingTask implements Runnable
 {
     private Map<String, Integer> index = new HashMap<>();
-    private LoadingCache<String, Pattern> regexCache = CacheBuilder.newBuilder().build(new CacheLoader<String, Pattern>()
-    {
-        @Override
-        public Pattern load(String s) throws Exception
-        {
-            return Pattern.compile(s);
-        }
-    });
     private int timeSinceLastRun = 0;
     private Random rnd = new Random();
 
@@ -172,29 +161,21 @@ public class AnnouncingTask implements Runnable
             index.put(key, val + 1);
     }
 
-    private List<Pattern> producePatterns(List<String> patterns)
-    {
-        List<Pattern> patterns1 = new ArrayList<>();
-        for (String pattern : patterns)
-        {
-            patterns1.add(regexCache.getUnchecked(pattern));
-        }
-        return patterns1;
-    }
-
     private boolean doesAnnouncementMatch(Announcement announcement, String server)
     {
         if (announcement.getServers().contains(server) || announcement.getServers().contains("global"))
         {
             return true;
         }
-        for (Pattern pattern : producePatterns(announcement.getServers()))
+
+        for (String s : announcement.getServers())
         {
-            if (pattern.matcher(server).find())
+            if (Pattern.compile(s).matcher(server).find())
             {
                 return true;
             }
         }
+
         return false;
     }
 }
