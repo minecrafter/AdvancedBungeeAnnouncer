@@ -201,6 +201,7 @@ public class AnnouncerCommand extends Command
                     {
                         commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Not enough arguments specified."));
                         commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/announcer info <id>"));
+                        return;
                     }
                     Announcement a = AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().get(strings[1]);
                     commandSender.sendMessage(TextComponent.fromLegacyText("-------------------------------------"));
