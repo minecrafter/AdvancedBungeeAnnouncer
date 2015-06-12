@@ -74,7 +74,9 @@ public class AnnouncerCommand extends Command
                     {
                         servers = Collections.singletonList(strings[2]);
                     }
-                    AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().put(strings[1], Announcement.create(message, servers));
+                    Announcement announcement = new Announcement(message);
+                    announcement.getServers().addAll(servers);
+                    AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().put(strings[1], announcement);
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "New announcement added."));
                 } else
                 {
@@ -102,88 +104,6 @@ public class AnnouncerCommand extends Command
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "You do not have permission to remove announcements."));
                 }
                 break;
-            case "setline":
-                if (commandSender.hasPermission("advancedbungeeannouncer.admin"))
-                {
-                    if (strings.length < 4)
-                    {
-                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Not enough arguments specified."));
-                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/announcer setline <id> <number> <text>"));
-                        return;
-                    }
-                    if (!AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().containsKey(strings[1]))
-                    {
-                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An announcement with this ID does not exist."));
-                        return;
-                    }
-                    Announcement a = AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().get(strings[1]);
-                    try
-                    {
-                        a.getText().set(Integer.valueOf(strings[2]), Joiner.on(" ").join(Arrays.copyOfRange(strings, 3, strings.length)));
-                    }
-                    catch (NumberFormatException | IndexOutOfBoundsException e)
-                    {
-                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "That line number is invalid."));
-                        return;
-                    }
-                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "Announcement updated!"));
-                } else
-                {
-                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "You do not have permission to update announcements."));
-                }
-                break;
-            case "addline":
-                if (commandSender.hasPermission("advancedbungeeannouncer.admin"))
-                {
-                    if (strings.length < 3)
-                    {
-                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Not enough arguments specified."));
-                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/announcer addline <id> <text>"));
-                        return;
-                    }
-                    if (!AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().containsKey(strings[1]))
-                    {
-                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An announcement with this ID does not exist."));
-                        return;
-                    }
-                    Announcement a = AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().get(strings[1]);
-                    a.getText().add(Joiner.on(" ").join(Arrays.copyOfRange(strings, 2, strings.length)));
-                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "Announcement updated!"));
-                } else
-                {
-                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "You do not have permission to update announcements."));
-                }
-                break;
-            case "removeline":
-                if (commandSender.hasPermission("advancedbungeeannouncer.admin"))
-                {
-                    if (strings.length < 3)
-                    {
-                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Not enough arguments specified."));
-                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/announcer removeline <id> <number>"));
-                        return;
-                    }
-                    if (!AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().containsKey(strings[1]))
-                    {
-                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An announcement with this ID does not exist."));
-                        return;
-                    }
-                    Announcement a = AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().get(strings[1]);
-                    try
-                    {
-                        a.getText().remove((int) Integer.valueOf(strings[2]));
-                    }
-                    catch (NumberFormatException | IndexOutOfBoundsException e)
-                    {
-                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "That line number is invalid."));
-                        return;
-                    }
-                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "Announcement updated!"));
-                } else
-                {
-                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "You do not have permission to update announcements."));
-                }
-                break;
             case "list":
                 if (commandSender.hasPermission("advancedbungeeannouncer.admin"))
                 {
@@ -205,11 +125,8 @@ public class AnnouncerCommand extends Command
                     Announcement a = AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().get(strings[1]);
                     commandSender.sendMessage(TextComponent.fromLegacyText("-------------------------------------"));
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "Announcement ID: " + strings[1]));
-                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "Announcement Text: (lines: " + a.getText().size() + ")"));
-                    for (String line : a.getText())
-                    {
-                        commandSender.sendMessage(TextComponent.fromLegacyText("- " + ChatColor.translateAlternateColorCodes('&', line)));
-                    }
+                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "Announcement Text:"));
+                    commandSender.sendMessage(TextComponent.fromLegacyText(a.getText()));
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "Sent To: " + Joiner.on(", ").join(a.getServers())));
                     commandSender.sendMessage(TextComponent.fromLegacyText("-------------------------------------"));
                 } else

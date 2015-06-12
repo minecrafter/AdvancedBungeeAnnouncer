@@ -1,5 +1,6 @@
 package com.imaginarycode.minecraft.advancedbungeeannouncer.config;
 
+import com.google.common.base.Joiner;
 import com.imaginarycode.minecraft.advancedbungeeannouncer.AdvancedBungeeAnnouncer;
 import com.imaginarycode.minecraft.advancedbungeeannouncer.Announcement;
 import lombok.Getter;
@@ -47,11 +48,21 @@ public class AnnouncementConfig
             throw new RuntimeException("Could not load announcements", e);
         }
 
-        if (announcements.get("announcements") instanceof Map && !((Map) announcements.get("announcements")).containsKey("text"))
+        if (announcements.get("DO_NOT_TOUCH_VERSION") == null)
         {
-            plugin.getLogger().info("Migrating your announcements.yml to a flattened structure.");
-
+            plugin.getLogger().info("No version found, so migrating your announcements.yml to a flattened structure (configuration version 1).");
             announcements = announcements.getSection("announcements");
+            Collection<String> keys = announcements.getKeys();
+
+            for (String key : keys)
+            {
+                if (announcements.get(key + ".text") instanceof List)
+                {
+                    announcements.set(key + ".text", Joiner.on('\n').join(announcements.getStringList(key + ".text")));
+                }
+            }
+
+            announcements.set("DO_NOT_TOUCH_VERSION", 1);
 
             File old = new File(plugin.getDataFolder(), "announcements.yml.old");
             File conf = new File(plugin.getDataFolder(), "announcements.yml");
@@ -76,12 +87,11 @@ public class AnnouncementConfig
 
         for (String key : keys)
         {
-            if (announcements.get(key + ".text") instanceof List)
+            if (announcements.get(key + ".servers") instanceof List)
             {
-                if (announcements.get(key + ".servers") instanceof List)
-                {
-                    this.announcements.put(key, Announcement.create(announcements.getStringList(key + ".text"), announcements.getStringList(key + ".servers")));
-                }
+                Announcement announcement = new Announcement(announcements.getString(key + ".text"));
+                announcement.getServers().addAll(announcements.getStringList(key + ".servers"));
+                this.announcements.put(key, announcement);
             }
         }
     }

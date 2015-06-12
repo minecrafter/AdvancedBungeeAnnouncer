@@ -23,9 +23,10 @@ import java.util.regex.Pattern;
 
 public class AnnouncingTask implements Runnable
 {
-    private Map<String, Integer> index = new HashMap<>();
+    private final Map<String, Integer> index = new HashMap<>();
     private int timeSinceLastRun = 0;
-    private Random rnd = new Random();
+    private final Random rnd = new Random();
+    private List<Announcement> announcements;
 
     @Override
     public void run()
@@ -39,7 +40,9 @@ public class AnnouncingTask implements Runnable
             return;
         }
 
-        if (AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().isEmpty())
+        announcements = ImmutableList.copyOf(AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().values());
+
+        if (announcements.isEmpty())
             return;
 
         String prefix = ChatColor.translateAlternateColorCodes('&', AdvancedBungeeAnnouncer.getConfiguration().getPrefix());
@@ -74,30 +77,29 @@ public class AnnouncingTask implements Runnable
 
             List<BaseComponent[]> components = new ArrayList<>();
 
-            for (String line : announcement.getText())
+            String line = announcement.getText();
+
+            if (line.startsWith("{"))
             {
-                if (line.startsWith("{"))
+                try
                 {
-                    try
-                    {
-                        BaseComponent[] components2 = ComponentSerializer.parse(line);
-                        BaseComponent[] prefixComp = TextComponent.fromLegacyText(prefix);
+                    BaseComponent[] components2 = ComponentSerializer.parse(line);
+                    BaseComponent[] prefixComp = TextComponent.fromLegacyText(prefix);
 
-                        if (prefixComp.length != 0)
-                            prefixComp[prefixComp.length - 1].setExtra(Arrays.asList(components2));
-                        else
-                            prefixComp = components2;
+                    if (prefixComp.length != 0)
+                        prefixComp[prefixComp.length - 1].setExtra(Arrays.asList(components2));
+                    else
+                        prefixComp = components2;
 
-                        components.add(prefixComp);
-                    }
-                    catch (Exception ignored)
-                    {
-                        components.add(TextComponent.fromLegacyText(prefix + ChatColor.translateAlternateColorCodes('&', line)));
-                    }
-                } else
+                    components.add(prefixComp);
+                }
+                catch (Exception ignored)
                 {
                     components.add(TextComponent.fromLegacyText(prefix + ChatColor.translateAlternateColorCodes('&', line)));
                 }
+            } else
+            {
+                components.add(TextComponent.fromLegacyText(prefix + ChatColor.translateAlternateColorCodes('&', line)));
             }
 
             for (BaseComponent[] component : components)
@@ -110,7 +112,6 @@ public class AnnouncingTask implements Runnable
 
     private Announcement selectAnnouncementFor(String server)
     {
-        List<Announcement> announcements = ImmutableList.copyOf(AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().values());
         Announcement a;
         int tries = 0;
         if (AdvancedBungeeAnnouncer.getConfiguration().getMethod() == SelectionMethod.SEQUENTIAL)
