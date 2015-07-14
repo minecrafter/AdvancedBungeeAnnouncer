@@ -26,6 +26,7 @@ public class AnnouncementConfig
     private AnnouncementDisplay display;
     private String prefix;
     private int delay;
+    private int actionBarPeriod;
 
     public AnnouncementConfig(AdvancedBungeeAnnouncer plugin)
     {
@@ -132,6 +133,8 @@ public class AnnouncementConfig
             plugin.getLogger().info("Invalid display method " + configuration.getString("display"));
             method = SelectionMethod.SEQUENTIAL;
         }
+
+        actionBarPeriod = configuration.getInt("action-bar-period", 1);
     }
 
     public void saveAnnouncements()

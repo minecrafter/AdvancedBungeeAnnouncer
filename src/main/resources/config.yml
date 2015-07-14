@@ -37,3 +37,7 @@ prefix: ""
 #           is sent as a chat message.
 
 display: chat
+
+# Allows to customize how long the action bar remains on the screen.
+# The message will be present for this many seconds at least.
+# Values below or equal to 1 will only send the message once.

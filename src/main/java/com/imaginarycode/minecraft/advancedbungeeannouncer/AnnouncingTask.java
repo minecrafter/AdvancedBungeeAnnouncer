@@ -48,7 +48,8 @@ public class AnnouncingTask implements Runnable
         String prefix = ChatColor.translateAlternateColorCodes('&', AdvancedBungeeAnnouncer.getConfiguration().getPrefix());
 
         // Select and display our announcements.
-        Map<String, Announcement> selectedAnnouncements = new HashMap<>();
+        Map<String, Announcement> serverAnnouncements = new HashMap<>();
+        Map<String, BaseComponent[]> perPlayerAnnouncements = new HashMap<>();
 
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers())
         {
@@ -67,15 +68,15 @@ public class AnnouncingTask implements Runnable
             if (!index.containsKey(info.getName()))
                 index.put(info.getName(), 0);
 
-            Announcement announcement = selectedAnnouncements.get(info.getName());
+            Announcement announcement = serverAnnouncements.get(info.getName());
 
             if (announcement == null)
-                selectedAnnouncements.put(info.getName(), announcement = selectAnnouncementFor(info.getName()));
+                serverAnnouncements.put(info.getName(), announcement = selectAnnouncementFor(info.getName()));
 
             if (announcement == null)
                 continue;
 
-            List<BaseComponent[]> components = new ArrayList<>();
+            BaseComponent[] components;
 
             String line = announcement.getText();
 
@@ -91,22 +92,37 @@ public class AnnouncingTask implements Runnable
                     else
                         prefixComp = components2;
 
-                    components.add(prefixComp);
+                    components = prefixComp;
                 }
                 catch (Exception ignored)
                 {
-                    components.add(TextComponent.fromLegacyText(prefix + ChatColor.translateAlternateColorCodes('&', line)));
+                    components = TextComponent.fromLegacyText(prefix + ChatColor.translateAlternateColorCodes('&', line));
                 }
             } else
             {
-                components.add(TextComponent.fromLegacyText(prefix + ChatColor.translateAlternateColorCodes('&', line)));
+                components = TextComponent.fromLegacyText(prefix + ChatColor.translateAlternateColorCodes('&', line));
             }
 
-            for (BaseComponent[] component : components)
-            {
-                player.sendMessage(AdvancedBungeeAnnouncer.getConfiguration().getDisplay() == AnnouncementDisplay.ACTION ?
-                        ChatMessageType.ACTION_BAR : ChatMessageType.CHAT, component);
-            }
+            perPlayerAnnouncements.put(player.getName(), components);
+        }
+
+        switch (AdvancedBungeeAnnouncer.getConfiguration().getDisplay())
+        {
+            case CHAT:
+                for (Map.Entry<String, BaseComponent[]> entry : perPlayerAnnouncements.entrySet())
+                {
+                    ProxiedPlayer player = ProxyServer.getInstance().getPlayer(entry.getKey());
+
+                    if (player != null)
+                    {
+                        player.sendMessage(entry.getValue());
+                    }
+                }
+                break;
+            case ACTION:
+                // We aren't able to do much better than this
+                new ActionBarRepeatingTask(perPlayerAnnouncements, AdvancedBungeeAnnouncer.getConfiguration().getActionBarPeriod()).start();
+                break;
         }
     }
 
