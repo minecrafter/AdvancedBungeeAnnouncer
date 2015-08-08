@@ -12,6 +12,7 @@ import com.imaginarycode.minecraft.advancedbungeeannouncer.config.SelectionMetho
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.Title;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -122,6 +123,23 @@ public class AnnouncingTask implements Runnable
             case ACTION:
                 // We aren't able to do much better than this
                 new ActionBarRepeatingTask(perPlayerAnnouncements, AdvancedBungeeAnnouncer.getConfiguration().getActionBarPeriod()).start();
+                break;
+            case TITLE:
+                for (Map.Entry<String, BaseComponent[]> entry : perPlayerAnnouncements.entrySet())
+                {
+                    ProxiedPlayer player = ProxyServer.getInstance().getPlayer(entry.getKey());
+
+                    if (player != null)
+                    {
+                        ProxyServer.getInstance().createTitle()
+                                .fadeIn(AdvancedBungeeAnnouncer.getConfiguration().getTitleDisplay().getFadeIn())
+                                .fadeOut(AdvancedBungeeAnnouncer.getConfiguration().getTitleDisplay().getFadeOut())
+                                .stay(AdvancedBungeeAnnouncer.getConfiguration().getTitleDisplay().getStay())
+                                .title(AdvancedBungeeAnnouncer.getConfiguration().getTitleDisplay().getTitle())
+                                .subTitle(entry.getValue())
+                                .send(player);
+                    }
+                }
                 break;
         }
     }

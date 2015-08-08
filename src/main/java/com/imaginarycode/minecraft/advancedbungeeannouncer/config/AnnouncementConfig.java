@@ -27,6 +27,7 @@ public class AnnouncementConfig
     private String prefix;
     private int delay;
     private int actionBarPeriod;
+    private TitleDisplay titleDisplay;
 
     public AnnouncementConfig(AdvancedBungeeAnnouncer plugin)
     {
@@ -88,12 +89,10 @@ public class AnnouncementConfig
 
         for (String key : keys)
         {
-            if (announcements.get(key + ".servers") instanceof List)
-            {
-                Announcement announcement = new Announcement(announcements.getString(key + ".text"));
-                announcement.getServers().addAll(announcements.getStringList(key + ".servers"));
-                this.announcements.put(key, announcement);
-            }
+            if (!(announcements.get(key) instanceof Map)) continue;
+            Announcement announcement = new Announcement(announcements.getString(key + ".text"));
+            announcement.getServers().addAll(announcements.getStringList(key + ".servers"));
+            this.announcements.put(key, announcement);
         }
     }
 
@@ -131,10 +130,11 @@ public class AnnouncementConfig
         catch (IllegalArgumentException e)
         {
             plugin.getLogger().info("Invalid display method " + configuration.getString("display"));
-            method = SelectionMethod.SEQUENTIAL;
+            display = AnnouncementDisplay.CHAT;
         }
 
         actionBarPeriod = configuration.getInt("action-bar-period", 1);
+        titleDisplay = TitleDisplay.deserialize(configuration);
     }
 
     public void saveAnnouncements()
@@ -146,6 +146,8 @@ public class AnnouncementConfig
             configuration.set(entry.getKey() + ".text", entry.getValue().getText());
             configuration.set(entry.getKey() + ".servers", entry.getValue().getServers());
         }
+
+        configuration.set("DO_NOT_TOUCH_VERSION", 1);
 
         try
         {

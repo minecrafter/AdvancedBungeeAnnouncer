@@ -23,7 +23,7 @@ public class ActionBarRepeatingTask implements Runnable {
             run();
         } else
         {
-            ProxyServer.getInstance().getScheduler().schedule(AdvancedBungeeAnnouncer.getPlugin(), this, 0, 1, TimeUnit.SECONDS);
+            task = ProxyServer.getInstance().getScheduler().schedule(AdvancedBungeeAnnouncer.getPlugin(), this, 0, 1, TimeUnit.SECONDS);
         }
     }
 
