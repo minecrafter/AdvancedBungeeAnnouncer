@@ -127,7 +127,10 @@ public class AnnouncerCommand extends Command
                     commandSender.sendMessage(TextComponent.fromLegacyText("-------------------------------------"));
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "Announcement ID: " + strings[1]));
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "Announcement Text:"));
-                    commandSender.sendMessage(TextComponent.fromLegacyText(a.getText()));
+                    for (String s : a.getText().split("\n"))
+                    {
+                        commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "-" + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', s)));
+                    }
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "Sent To: " + Joiner.on(", ").join(a.getServers())));
                     commandSender.sendMessage(TextComponent.fromLegacyText("-------------------------------------"));
                 } else
