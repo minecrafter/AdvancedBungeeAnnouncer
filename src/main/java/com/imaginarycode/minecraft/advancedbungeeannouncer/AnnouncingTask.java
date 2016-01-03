@@ -7,12 +7,9 @@
 package com.imaginarycode.minecraft.advancedbungeeannouncer;
 
 import com.google.common.collect.ImmutableList;
-import com.imaginarycode.minecraft.advancedbungeeannouncer.config.AnnouncementDisplay;
 import com.imaginarycode.minecraft.advancedbungeeannouncer.config.SelectionMethod;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.Title;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -81,7 +78,7 @@ public class AnnouncingTask implements Runnable
 
             String line = announcement.getText();
 
-            if (line.startsWith("{"))
+            if (line.startsWith("{") || line.startsWith("["))
             {
                 try
                 {
