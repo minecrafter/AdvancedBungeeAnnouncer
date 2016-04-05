@@ -67,9 +67,6 @@ public class AnnouncingTask implements Runnable
                     player.hasPermission("advancedbungeeannouncer.ignore.server." + info.getName()))
                 continue;
 
-            if (!index.containsKey(info.getName()))
-                index.put(info.getName(), 0);
-
             Announcement announcement = serverAnnouncements.get(info.getName());
 
             if (announcement == null)
@@ -156,9 +153,9 @@ public class AnnouncingTask implements Runnable
         {
             while (tries < 5)
             {
-                int idx = index.get(server);
+                Integer idx = index.get(server);
 
-                if (idx >= announcements.size())
+                if (idx == null || idx >= announcements.size())
                 {
                     // Reset the index
                     idx = 0;
