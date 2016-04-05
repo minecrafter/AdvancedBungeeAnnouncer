@@ -14,7 +14,7 @@
 
     <groupId>com.imaginarycode.minecraft</groupId>
     <artifactId>advanced-bungee-announcer</artifactId>
-    <version>0.2.1-SNAPSHOT</version>
+    <version>0.3</version>
 
     <inceptionYear>2013</inceptionYear>
 
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.8-SNAPSHOT</version>
+            <version>1.9-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>

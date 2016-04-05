@@ -12,22 +12,21 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class AnnouncementConfig
 {
     private final AdvancedBungeeAnnouncer plugin;
-    private final Map<String, Announcement> announcements = new ConcurrentHashMap<>(10, 0.75f, 1);
+    private final Map<String, Announcement> announcements = Collections.synchronizedMap(new LinkedHashMap<String, Announcement>());
     private SelectionMethod method;
     private AnnouncementDisplay display;
     private String prefix;
     private int delay;
     private int actionBarPeriod;
     private TitleDisplay titleDisplay;
+    private BarDisplay barDisplay;
 
     public AnnouncementConfig(AdvancedBungeeAnnouncer plugin)
     {
@@ -135,6 +134,7 @@ public class AnnouncementConfig
 
         actionBarPeriod = configuration.getInt("action-bar-period", 1);
         titleDisplay = TitleDisplay.deserialize(configuration);
+        barDisplay = BarDisplay.deserialize(configuration);
     }
 
     public void saveAnnouncements()

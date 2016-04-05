@@ -4,5 +4,6 @@ public enum AnnouncementDisplay
 {
     CHAT,
     ACTION,
-    TITLE
+    TITLE,
+    BOSS_BAR
 }

@@ -32,9 +32,9 @@ prefix: ""
 # Choose how the announcements are displayed.
 # Choices available:
 # - chat: Sends messages to chat
-# - action: Sends the announcement as an above action bar message
-# NOTE:     If the player is not using Minecraft 1.8, the announcement
-#           is sent as a chat message.
+# - action: Sends the announcement as an above action bar message (>=1.8)
+# - title: Sends the announcement as a title. (>=1.8)
+# - boss_bar: Sends the announcement as a boss bar message. (>=1.9)
 
 display: chat
 
@@ -49,3 +49,11 @@ title:
   fade-in: 40
   stay: 80
   fade-out: 40
+
+# Boss bar configuration.
+bar-display:
+  # Colors: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE
+  color: white
+  # Divisions: NONE, SIX, TEN, TWELVE, TWENTY
+  # You can _not_ use numbers, you must use these words.
+  division: solid

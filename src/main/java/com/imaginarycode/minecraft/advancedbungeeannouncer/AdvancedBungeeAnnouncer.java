@@ -6,6 +6,7 @@
  */
 package com.imaginarycode.minecraft.advancedbungeeannouncer;
 
+import com.imaginarycode.minecraft.advancedbungeeannouncer.bossbar.BossBarHousekeeper;
 import com.imaginarycode.minecraft.advancedbungeeannouncer.config.AnnouncementConfig;
 import lombok.Getter;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -31,6 +32,7 @@ public class AdvancedBungeeAnnouncer extends Plugin
         }
 
         getProxy().getPluginManager().registerCommand(this, new AnnouncerCommand());
+        getProxy().getPluginManager().registerListener(this, BossBarHousekeeper.getInstance());
         getProxy().getScheduler().schedule(this, new AnnouncingTask(), 1, 1, TimeUnit.SECONDS);
     }
 

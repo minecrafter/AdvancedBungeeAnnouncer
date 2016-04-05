@@ -9,6 +9,7 @@ package com.imaginarycode.minecraft.advancedbungeeannouncer;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import com.imaginarycode.minecraft.advancedbungeeannouncer.bossbar.BossBarHousekeeper;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -41,6 +42,7 @@ public class AnnouncerCommand extends Command
             case "reload":
                 AdvancedBungeeAnnouncer.getConfiguration().reloadAnnouncements();
                 AdvancedBungeeAnnouncer.getConfiguration().reloadConfiguration();
+                BossBarHousekeeper.getInstance().restyleBarsForReload();
                 commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "The plugin was reloaded successfully."));
                 break;
             case "create":
@@ -103,13 +105,13 @@ public class AnnouncerCommand extends Command
                 commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "Announcement Text:"));
                 for (String s : a.getText().split("\n"))
                 {
-                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "-" + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', s)));
+                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "- " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', s)));
                 }
                 commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "Sent To: " + Joiner.on(", ").join(a.getServers())));
                 commandSender.sendMessage(TextComponent.fromLegacyText("-------------------------------------"));
                 break;
             default:
-                commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/announcer <about|reload|create|remove|{set,add,remove}line|list|info>"));
+                commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/announcer <about|reload|create|remove|list|info>"));
         }
     }
 }

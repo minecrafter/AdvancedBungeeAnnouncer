@@ -7,6 +7,7 @@
 package com.imaginarycode.minecraft.advancedbungeeannouncer;
 
 import com.google.common.collect.ImmutableList;
+import com.imaginarycode.minecraft.advancedbungeeannouncer.bossbar.BossBarHousekeeper;
 import com.imaginarycode.minecraft.advancedbungeeannouncer.config.SelectionMethod;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -49,8 +50,6 @@ public class AnnouncingTask implements Runnable
         Map<String, Announcement> serverAnnouncements = new HashMap<>();
         Map<String, BaseComponent[]> perPlayerAnnouncements = new HashMap<>();
 
-        Collection<String> online = new HashSet<>();
-
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers())
         {
             if (player.getServer() == null)
@@ -58,8 +57,6 @@ public class AnnouncingTask implements Runnable
                 // No use in giving connecting players an announcement
                 continue;
             }
-
-            online.add(player.getName());
 
             ServerInfo info = player.getServer().getInfo();
 
@@ -139,62 +136,77 @@ public class AnnouncingTask implements Runnable
                     }
                 }
                 break;
-        }
+            case BOSS_BAR:
+                for (Map.Entry<String, BaseComponent[]> entry : perPlayerAnnouncements.entrySet())
+                {
+                    ProxiedPlayer player = ProxyServer.getInstance().getPlayer(entry.getKey());
 
-        // Clean up the index map afterwards
-        index.keySet().retainAll(online);
+                    if (player != null)
+                    {
+                        String json = ComponentSerializer.toString(entry.getValue());
+                        BossBarHousekeeper.getInstance().setBar(player, json);
+                    }
+                }
+        }
     }
 
     private Announcement selectAnnouncementFor(String server)
     {
         Announcement a;
-        int tries = 0;
         if (AdvancedBungeeAnnouncer.getConfiguration().getMethod() == SelectionMethod.SEQUENTIAL)
         {
-            while (tries < 5)
+            for (int i = 0; i < 5; i++)
             {
                 Integer idx = index.get(server);
 
-                if (idx == null || idx >= announcements.size())
+                if (idx == null)
                 {
                     // Reset the index
                     idx = 0;
                     index.put(server, 0);
+                } else
+                {
+                    idx = advanced(server);
                 }
 
                 a = announcements.get(idx);
-                advanced(server);
                 if (doesAnnouncementMatch(a, server))
+                {
                     return a;
-                tries++;
+                }
             }
         } else
         {
-            while (tries < 5)
+            for (int i = 0; i < 5; i++)
             {
                 a = announcements.get(rnd.nextInt(announcements.size()));
                 if (doesAnnouncementMatch(a, server))
                     return a;
-                tries++;
             }
-            // Forget it, let's just find one.
-            for (Announcement announcement : announcements)
-            {
-                if (doesAnnouncementMatch(announcement, server))
-                    return announcement;
-            }
+        }
+
+        // Forget it, let's just find one.
+        for (Announcement announcement : announcements)
+        {
+            if (doesAnnouncementMatch(announcement, server))
+                return announcement;
         }
         return null;
     }
 
-    private void advanced(String key)
+    private int advanced(String key)
     {
         int val = index.get(key);
 
+        int to;
+
         if (val + 1 >= AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().size())
-            index.put(key, 0);
+            to = 0;
         else
-            index.put(key, val + 1);
+            to = val + 1;
+
+        index.put(key, to);
+        return to;
     }
 
     private boolean doesAnnouncementMatch(Announcement announcement, String server)
