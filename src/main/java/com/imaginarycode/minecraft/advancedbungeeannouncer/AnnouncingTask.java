@@ -49,6 +49,8 @@ public class AnnouncingTask implements Runnable
         Map<String, Announcement> serverAnnouncements = new HashMap<>();
         Map<String, BaseComponent[]> perPlayerAnnouncements = new HashMap<>();
 
+        Collection<String> online = new HashSet<>();
+
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers())
         {
             if (player.getServer() == null)
@@ -56,6 +58,8 @@ public class AnnouncingTask implements Runnable
                 // No use in giving connecting players an announcement
                 continue;
             }
+
+            online.add(player.getName());
 
             ServerInfo info = player.getServer().getInfo();
 
@@ -139,6 +143,9 @@ public class AnnouncingTask implements Runnable
                 }
                 break;
         }
+
+        // Clean up the index map afterwards
+        index.keySet().retainAll(online);
     }
 
     private Announcement selectAnnouncementFor(String server)
