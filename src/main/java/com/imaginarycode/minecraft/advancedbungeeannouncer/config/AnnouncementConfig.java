@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class AnnouncementConfig
@@ -88,7 +87,9 @@ public class AnnouncementConfig
 
         for (String key : keys)
         {
-            if (!(announcements.get(key) instanceof Map)) continue;
+            Object object = announcements.get(key);
+            // API was changed to return Configuration instead of Map in BungeeCord commit 98e3c70
+            if (!(object instanceof Map) && !(object instanceof Configuration)) continue;
             Announcement announcement = new Announcement(announcements.getString(key + ".text"));
             announcement.getServers().addAll(announcements.getStringList(key + ".servers"));
             this.announcements.put(key, announcement);
