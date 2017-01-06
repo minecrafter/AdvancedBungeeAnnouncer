@@ -71,6 +71,7 @@ public class AnnouncerCommand extends Command
                 Announcement announcement = new Announcement(message);
                 announcement.getServers().addAll(servers);
                 AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().put(strings[1], announcement);
+                AdvancedBungeeAnnouncer.getConfiguration().saveAnnouncements();
                 commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "New announcement added."));
                 break;
             case "remove":
@@ -86,6 +87,7 @@ public class AnnouncerCommand extends Command
                     return;
                 }
                 AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().remove(strings[1]);
+                AdvancedBungeeAnnouncer.getConfiguration().saveAnnouncements();
                 commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "Announcement removed."));
                 break;
             case "list":

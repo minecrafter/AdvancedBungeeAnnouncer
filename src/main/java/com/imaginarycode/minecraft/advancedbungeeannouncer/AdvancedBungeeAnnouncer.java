@@ -36,9 +36,4 @@ public class AdvancedBungeeAnnouncer extends Plugin
         getProxy().getScheduler().schedule(this, new AnnouncingTask(), 1, 1, TimeUnit.SECONDS);
     }
 
-    @Override
-    public void onDisable()
-    {
-        configuration.saveAnnouncements();
-    }
 }
