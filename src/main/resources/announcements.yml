@@ -17,8 +17,8 @@ third:
   - global
   permission: announce.perm
 fourth:
-  text: '{"text":"Oh, and even JSON!","color":"gold"}'
+  text: '{"text":"Oh, and even JSON and don't need permission!","color":"gold"}'
   servers:
   - global
-  permission: announce.perm
+  permission: none
 DO_NOT_TOUCH_VERSION: 1
