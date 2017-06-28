@@ -74,7 +74,7 @@ public class AnnouncingTask implements Runnable
             if (announcement == null)
                 continue;
             
-			if (!player.hasPermission(announcement.getPerm())&&announcement.getPerm()!=null)
+			if (!player.hasPermission(announcement.getPerm())&&!announcement.getPerm().equalsIgnoreCase("none"))
 			            	continue;
 			
             BaseComponent[] components;
