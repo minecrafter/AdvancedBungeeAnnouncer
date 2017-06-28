@@ -49,7 +49,8 @@ public class AnnouncingTask implements Runnable
         // Select and display our announcements.
         Map<String, Announcement> serverAnnouncements = new HashMap<>();
         Map<String, BaseComponent[]> perPlayerAnnouncements = new HashMap<>();
-
+        
+        
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers())
         {
             if (player.getServer() == null)
@@ -59,22 +60,27 @@ public class AnnouncingTask implements Runnable
             }
 
             ServerInfo info = player.getServer().getInfo();
-
+            Announcement announcement = serverAnnouncements.get(info.getName());
+            
             if (player.hasPermission("advancedbungeeannouncer.ignore") ||
                     player.hasPermission("advancedbungeeannouncer.ignore.server." + info.getName()))
                 continue;
-
-            Announcement announcement = serverAnnouncements.get(info.getName());
+            
+            
 
             if (announcement == null)
                 serverAnnouncements.put(info.getName(), announcement = selectAnnouncementFor(info.getName()));
 
             if (announcement == null)
                 continue;
-
+            
+			if (!player.hasPermission(announcement.getPerm())&&announcement.getPerm()!=null)
+			            	continue;
+			
             BaseComponent[] components;
 
             String line = announcement.getText();
+           
 
             if (line.startsWith("{") || line.startsWith("["))
             {
@@ -112,6 +118,7 @@ public class AnnouncingTask implements Runnable
                     if (player != null)
                     {
                         player.sendMessage(entry.getValue());
+
                     }
                 }
                 break;
