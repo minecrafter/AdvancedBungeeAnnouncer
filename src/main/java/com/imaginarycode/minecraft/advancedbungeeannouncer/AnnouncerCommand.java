@@ -46,10 +46,10 @@ public class AnnouncerCommand extends Command
                 commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "The plugin was reloaded successfully."));
                 break;
             case "create":
-                if (strings.length < 4)
+                if (strings.length < 5)
                 {
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Not enough arguments specified."));
-                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/announcer create <id> <server(s)> <line 1>"));
+                    commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/announcer create <id> <server(s)> <permission> <line 1>"));
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "<server(s)> may be 'global' if the message is going to be sent to all servers."));
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "<server(s)> may have semicolons to separate server names, like hub;pvp."));
                     return;
@@ -59,7 +59,7 @@ public class AnnouncerCommand extends Command
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An announcement with this ID already exists."));
                     return;
                 }
-                String message = Joiner.on(" ").join(Arrays.copyOfRange(strings, 3, strings.length));
+                String message = Joiner.on(" ").join(Arrays.copyOfRange(strings, 4, strings.length));
                 List<String> servers;
                 if (strings[2].contains(";"))
                 {
@@ -68,7 +68,7 @@ public class AnnouncerCommand extends Command
                 {
                     servers = Collections.singletonList(strings[2]);
                 }
-                Announcement announcement = new Announcement(message);
+                Announcement announcement = new Announcement(message,strings[3]);
                 announcement.getServers().addAll(servers);
                 AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().put(strings[1], announcement);
                 AdvancedBungeeAnnouncer.getConfiguration().saveAnnouncements();
@@ -110,6 +110,7 @@ public class AnnouncerCommand extends Command
                     commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "- " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', s)));
                 }
                 commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "Sent To: " + Joiner.on(", ").join(a.getServers())));
+                commandSender.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "With perm: " + a.getPerm()));
                 commandSender.sendMessage(TextComponent.fromLegacyText("-------------------------------------"));
                 break;
             default:

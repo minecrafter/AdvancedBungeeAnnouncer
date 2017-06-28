@@ -16,4 +16,5 @@ public class Announcement
 {
     private final String text;
     private final List<String> servers = new ArrayList<>();
+    private final String perm;
 }

@@ -4,17 +4,21 @@ first:
     It supports multi-line announcements, global announcements...
   servers:
   - global
+  permission: announce.perm
 second:
   text: And even server-specific announcements!
   servers:
   - pvp
   - creative
+  permission: announce.perm
 third:
   text: '&9It even has support for colors!'
   servers:
   - global
+  permission: announce.perm
 fourth:
-  text: '{"text":"Oh, and even JSON!","color":"gold"}'
+  text: '{"text":"Oh, and even JSON and don't need permission!","color":"gold"}'
   servers:
   - global
+  permission: none
 DO_NOT_TOUCH_VERSION: 1
