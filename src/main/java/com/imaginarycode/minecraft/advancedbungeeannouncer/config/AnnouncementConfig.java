@@ -145,6 +145,7 @@ public class AnnouncementConfig
         for (Map.Entry<String, Announcement> entry : announcements.entrySet())
         {
             configuration.set(entry.getKey() + ".text", entry.getValue().getText());
+            configuration.set(entry.getKey() + ".expiryTimestamp", entry.getValue().getExpiryTimestamp());
             configuration.set(entry.getKey() + ".servers", entry.getValue().getServers());
         }
 
