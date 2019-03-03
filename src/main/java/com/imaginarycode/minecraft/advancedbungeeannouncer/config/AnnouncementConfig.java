@@ -90,7 +90,7 @@ public class AnnouncementConfig
             Object object = announcements.get(key);
             // API was changed to return Configuration instead of Map in BungeeCord commit 98e3c70
             if (!(object instanceof Map) && !(object instanceof Configuration)) continue;
-            Announcement announcement = new Announcement(announcements.getString(key + ".text"));
+            Announcement announcement = new Announcement(announcements.getString(key + ".text"), announcements.getInt(key + ".expiryTimestamp", -1));
             announcement.getServers().addAll(announcements.getStringList(key + ".servers"));
             this.announcements.put(key, announcement);
         }

@@ -15,5 +15,6 @@ import java.util.List;
 public class Announcement
 {
     private final String text;
+    private final int expiryTimestamp;
     private final List<String> servers = new ArrayList<>();
 }

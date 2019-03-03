@@ -68,7 +68,7 @@ public class AnnouncerCommand extends Command
                 {
                     servers = Collections.singletonList(strings[2]);
                 }
-                Announcement announcement = new Announcement(message);
+                Announcement announcement = new Announcement(message, -1);
                 announcement.getServers().addAll(servers);
                 AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().put(strings[1], announcement);
                 AdvancedBungeeAnnouncer.getConfiguration().saveAnnouncements();
