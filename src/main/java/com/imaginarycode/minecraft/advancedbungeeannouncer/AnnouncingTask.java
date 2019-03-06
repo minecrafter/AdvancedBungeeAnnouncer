@@ -41,9 +41,6 @@ public class AnnouncingTask implements Runnable
 
         announcements = new ArrayList<>(AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().values());
 
-        if (announcements.isEmpty())
-            return;
-
         // Discard expired announcements
         Iterator<Announcement> announcementsIterator = announcements.iterator();
         int currentTimestamp = (int) (System.currentTimeMillis() / 1000);
@@ -54,7 +51,14 @@ public class AnnouncingTask implements Runnable
             {
                 announcementsIterator.remove();
             }
+            else if (announcement.getBeginTimestamp() > -1 && announcement.getBeginTimestamp() > currentTimestamp)
+            {
+                announcementsIterator.remove();
+            }
         }
+
+        if (announcements.isEmpty())
+            return;
 
         String prefix = ChatColor.translateAlternateColorCodes('&', AdvancedBungeeAnnouncer.getConfiguration().getPrefix());
 
