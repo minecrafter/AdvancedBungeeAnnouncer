@@ -39,7 +39,23 @@ public class AnnouncingTask implements Runnable
             return;
         }
 
-        announcements = ImmutableList.copyOf(AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().values());
+        announcements = new ArrayList<>(AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().values());
+
+        // Discard expired announcements
+        Iterator<Announcement> announcementsIterator = announcements.iterator();
+        int currentTimestamp = (int) (System.currentTimeMillis() / 1000);
+        while (announcementsIterator.hasNext())
+        {
+            Announcement announcement = announcementsIterator.next();
+            if (announcement.getExpiryTimestamp() > -1 && announcement.getExpiryTimestamp() < currentTimestamp)
+            {
+                announcementsIterator.remove();
+            }
+            else if (announcement.getBeginTimestamp() > -1 && announcement.getBeginTimestamp() > currentTimestamp)
+            {
+                announcementsIterator.remove();
+            }
+        }
 
         if (announcements.isEmpty())
             return;
@@ -200,7 +216,7 @@ public class AnnouncingTask implements Runnable
 
         int to;
 
-        if (val + 1 >= AdvancedBungeeAnnouncer.getConfiguration().getAnnouncements().size())
+        if (val + 1 >= announcements.size())
             to = 0;
         else
             to = val + 1;

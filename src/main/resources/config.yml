@@ -53,7 +53,7 @@ title:
 # Boss bar configuration.
 bar-display:
   # Colors: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE
-  color: white
+  color: WHITE
   # Divisions: NONE, SIX, TEN, TWELVE, TWENTY
   # You can _not_ use numbers, you must use these words.
-  division: solid
+  division: NONE
